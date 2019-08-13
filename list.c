@@ -34,20 +34,44 @@ uint32_t free_list_length(Flist *list);
 }
 
 
-static Node* create_node(uint32_t addr)
+static Node* create_node(uint32_t size)
 {
-	Node *new_node = (Node*)malloc(sizeof(Node));
+	Node *new_node = (Node*)my_malloc(sizeof(Node) + size);
 	new_node->addr=addr;
 	new_node->next=NULL;
 	new_ode->prev=NULL;
 	return new_node;
 }
 
+void *my_malloc(uint32_t nbytes)
+{
+	void *b;
+	int *p, *end;
+	int count =0;
 
-static void list_add_head(Blist *list, uint32_t addr)
+	b = sbrk(0);
+	// printf("address =%d \r\n", p);
+        p = (int *)b;
+        printf("address =%p \r\n", p);
+
+	end = p + nbytes;
+	brk(end);
+	while (p < end) 
+	{
+        	*p = count++;
+        	printf("address[%p] =%d \r\n", p, *p);
+        	p=p+1;
+	}
+   	brk(b);
+    	return 0;
+}
+	
+
+
+static void list_add_head(Blist *list, uint32_t size)
 {
 	assert(list!=NULL);
-        Node *new_node= create_node(addr);
+        Node *new_node= create_node(size);
         new_node->next=list->head;
         list->head=new_node;
 
@@ -61,10 +85,10 @@ static void list_add_head(Blist *list, uint32_t addr)
 }
 
 
-Blist* add_new_busy_block(Blist *list, uint32_t addr)
+Blist* add_new_busy_block(Blist *list, uint32_t size)
 {
 
-        list=list_add_head(list,addr);
+        list=list_add_head(list,size);
 
 	return list;
 }
